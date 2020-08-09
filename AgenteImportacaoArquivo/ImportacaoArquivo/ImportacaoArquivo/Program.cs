@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using log4net.Config;
 
 namespace ImportacaoArquivo
@@ -13,9 +14,13 @@ namespace ImportacaoArquivo
 
         static void ConfigSettings()
         {
-
-            localDirectory = System.Configuration.ConfigurationManager.AppSettings["localDirectory"].ToString();
             EscreverLog("Configurando localDirectory");
+            localDirectory = System.Configuration.ConfigurationManager.AppSettings["localDirectory"].ToString();
+
+            EscreverLog("Configurando localRepositorio");
+            localRepositorio = System.Configuration.ConfigurationManager.AppSettings["localRepositorio"].ToString();
+
+            MoverArquivos();
 
         }
 
@@ -27,7 +32,17 @@ namespace ImportacaoArquivo
 
         }
 
+        static void MoverArquivos()
+        {
+            DirectoryInfo dir = new DirectoryInfo(localDirectory);
+            string destino = localRepositorio;
 
+            foreach (FileInfo f in dir.GetFiles("*"))
+            {
+                EscreverLog("Arquivo sendo transferido" + f.Name);
+                File.Move(f.FullName, destino + f.Name);
+            }
+        }
 
         public static void EscreverLog(string mensagem, bool logDeErro = false, Exception erro = null)
         {
